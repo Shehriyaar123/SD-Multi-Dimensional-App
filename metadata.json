@@ -1,0 +1,5 @@
+{
+  "name": "Penta-App",
+  "description": "A 6-dimensional learning and career ecosystem featuring an AI Career Command Center, Global Study Platform, Elite Coding Arena, and Digital Knowledge Library.",
+  "requestFramePermissions": ["microphone", "camera"]
+}

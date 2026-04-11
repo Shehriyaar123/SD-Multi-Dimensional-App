@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Hide scrollbars globally */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+:root {
+  --bg: #ffffff;
+  --text: #09090b;
+  --border: #e4e4e7;
+  --surface: #f4f4f5;
+  --surface-hover: #e4e4e7;
+  --muted: #71717a;
+  --accent: #3b82f6;
+}
+
+.dark {
+  --bg: #050505;
+  --text: #ffffff;
+  --border: #27272a;
+  --surface: #09090b;
+  --surface-hover: #18181b;
+  --muted: #a1a1aa;
+  --accent: #3b82f6;
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --color-primary: var(--primary-color, #3b82f6);
+  --color-bg: var(--bg);
+  --color-text: var(--text);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-muted: var(--muted);
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    @apply antialiased transition-colors duration-300;
+    font-family: var(--font-sans);
+  }
+
+  /* Theme Overrides for hardcoded zinc classes - to catch any remaining ones */
+  .dark .bg-white { background-color: var(--bg); }
+  .dark .text-black { color: var(--text); }
+  
+  .light .bg-black { background-color: var(--bg); }
+  .light .bg-zinc-950 { background-color: var(--bg); }
+  .light .bg-zinc-900 { background-color: var(--surface); }
+  .light .bg-zinc-800 { background-color: var(--border); }
+  .light .border-zinc-800 { border-color: var(--border); }
+  .light .text-white { color: var(--text); }
+  .light .text-zinc-400 { color: var(--muted); }
+  .light .hover\:bg-zinc-900:hover { background-color: var(--surface-hover); }
+  .light .hover\:bg-zinc-800:hover { background-color: var(--surface-hover); }
+
+  .compact-mode {
+    font-size: 0.875rem;
+  }
+  
+  .compact-mode .p-8 { @apply p-4; }
+  .compact-mode .p-6 { @apply p-3; }
+  .compact-mode .p-4 { @apply p-2; }
+  .compact-mode .gap-8 { @apply gap-4; }
+  .compact-mode .gap-6 { @apply gap-3; }
+  .compact-mode .gap-4 { @apply gap-2; }
+  .compact-mode .space-y-8 { @apply space-y-4; }
+  .compact-mode .space-y-6 { @apply space-y-3; }
+  .compact-mode .space-y-4 { @apply space-y-2; }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    @apply opacity-[0.03] pointer-events-none fixed inset-0 z-[100];
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    display: block !important;
+    width: 6px !important;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    display: block !important;
+    @apply bg-zinc-700 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    display: block !important;
+    @apply bg-transparent;
+  }
+  .custom-scrollbar {
+    -ms-overflow-style: auto !important;
+    scrollbar-width: thin !important;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');

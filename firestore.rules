@@ -1,0 +1,140 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (request.auth.token.email == "vvce23ise0271@vvce.ac.in" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function isTeacher() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+    
+    // Users
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+      
+      // AI Chats (Legacy)
+      match /ai_chats/{chatId} {
+        allow read, write: if isOwner(userId);
+        match /messages/{messageId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
+      
+      // Sessions
+      match /sessions/{sessionId} {
+        allow read, write: if isOwner(userId);
+        match /messages/{messageId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
+      
+      // Study Sessions
+      match /study_sessions/{sessionId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Stats
+      match /stats/{statId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Nicknames
+      match /nicknames/{nicknameId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+
+    // Groups
+    match /groups/{groupId} {
+      allow read, update: if isAuthenticated();
+      allow create: if isTeacher() || isAdmin();
+      
+      match /messages/{messageId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // Chats
+    match /chats/{chatId} {
+      allow read, update: if isAuthenticated() && (resource == null || request.auth.uid in resource.data.participants);
+      allow create: if isAuthenticated();
+      
+      match /messages/{messageId} {
+        allow read, write: if isAuthenticated() && (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants);
+      }
+    }
+
+    // Reports
+    match /reports/{reportId} {
+      allow create: if isAuthenticated();
+    }
+
+    // Coding Platform
+    match /coding_problems/{problemId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Knowledge Library
+    match /library_resources/{resourceId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /learning_paths/{pathId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // System Logs
+    match /system_logs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin();
+    }
+
+    // Connection Requests
+    match /connection_requests/{requestId} {
+      allow read: if isAuthenticated() && (
+        isTeacher() || 
+        isAdmin() || 
+        (resource != null && request.auth.uid in resource.data.participants) ||
+        (resource == null) // Allow queries that will be filtered by participants
+      );
+      allow create: if isAuthenticated() && 
+        request.resource.data.fromId == request.auth.uid &&
+        request.auth.uid in request.resource.data.participants;
+      allow update: if isTeacher() || isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}

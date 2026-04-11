@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique identifier"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["student", "teacher", "personal", "admin"],
+          "description": "The user's role"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's display name"
+        }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Stores user profiles and roles"
+    },
+    "users/{userId}/nicknames/{nicknameId}": {
+      "schema": {
+        "title": "Nickname",
+        "type": "object",
+        "properties": {
+          "nickname": { "type": "string" },
+          "userId": { "type": "string" }
+        }
+      },
+      "description": "Personalized nicknames for other users"
+    },
+    "groups/{groupId}": {
+      "schema": {
+        "title": "Group",
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "topic": { "type": "string" },
+          "members": { "type": "number" },
+          "isPublic": { "type": "boolean" }
+        }
+      },
+      "description": "Public study groups"
+    },
+    "chats/{chatId}": {
+      "schema": {
+        "title": "Chat",
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "string", "enum": ["dm", "group"] },
+          "participants": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "description": "Private messages and group chats"
+    },
+    "chats/{chatId}/messages/{messageId}": {
+      "schema": {
+        "title": "Message",
+        "type": "object",
+        "properties": {
+          "senderId": { "type": "string" },
+          "senderName": { "type": "string" },
+          "text": { "type": "string" },
+          "timestamp": { "type": "string" }
+        }
+      },
+      "description": "Messages within a chat"
+    },
+    "system_logs/{logId}": {
+      "schema": {
+        "title": "SystemLog",
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "userName": { "type": "string" },
+          "action": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "type": { "type": "string", "enum": ["info", "warning", "error", "success"] },
+          "dimension": { "type": "string" }
+        }
+      },
+      "description": "Real-time system activity logs for admins"
+    },
+    "connection_requests/{requestId}": {
+      "schema": {
+        "title": "ConnectionRequest",
+        "type": "object",
+        "properties": {
+          "fromId": { "type": "string" },
+          "fromName": { "type": "string" },
+          "toId": { "type": "string" },
+          "toName": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "description": "Requests to connect between users, requiring teacher approval"
+    }
+  }
+}
