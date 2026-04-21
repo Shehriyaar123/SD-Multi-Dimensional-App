@@ -17,13 +17,32 @@ const initialResume: ResumeData = {
   education: [],
   skills: [],
   projects: [],
+  coursework: [],
+  certifications: [],
 };
 
 export default function CareerDashboard() {
   const [activeTab, setActiveTab] = useState<CareerTab>('overview');
   const [resume] = useState<ResumeData>(() => {
     const saved = localStorage.getItem('penta_resume');
-    return saved ? JSON.parse(saved) : initialResume;
+    if (!saved) return initialResume;
+    
+    try {
+      const parsed = JSON.parse(saved);
+      return {
+        ...initialResume,
+        ...parsed,
+        personalInfo: { ...initialResume.personalInfo, ...(parsed.personalInfo || {}) },
+        experience: parsed.experience || [],
+        education: parsed.education || [],
+        skills: parsed.skills || [],
+        projects: parsed.projects || [],
+        coursework: parsed.coursework || [],
+        certifications: parsed.certifications || [],
+      };
+    } catch {
+      return initialResume;
+    }
   });
 
   const tabs = [

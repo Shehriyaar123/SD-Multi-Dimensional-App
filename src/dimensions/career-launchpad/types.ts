@@ -7,11 +7,21 @@ export interface ResumeData {
     linkedin: string;
     website: string;
     summary: string;
+    profileImage?: string;
+    socialLinks?: SocialLink[];
   };
   experience: Experience[];
   education: Education[];
   skills: string[];
   projects: Project[];
+  coursework: string[];
+  certifications: Certification[];
+}
+
+export interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
 }
 
 export interface Experience {
@@ -33,6 +43,8 @@ export interface Education {
   location: string;
   startDate: string;
   endDate: string;
+  grade?: string;
+  gradeType?: 'cgpa' | 'percentage';
 }
 
 export interface Project {
@@ -41,6 +53,13 @@ export interface Project {
   description: string;
   link: string;
   technologies: string[];
+}
+
+export interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  date: string;
 }
 
 export interface ResumeAnalysis {

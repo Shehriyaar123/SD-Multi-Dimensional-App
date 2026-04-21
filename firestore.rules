@@ -94,12 +94,12 @@ service cloud.firestore {
 
     // Coding Platform
     match /coding_problems/{problemId} {
-      allow read: if isAuthenticated();
+      allow read, list: if isAuthenticated();
       allow create, update, delete: if isAdmin();
     }
 
-    match /submissions/{submissionId} {
-      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
+    match /coding_submissions/{submissionId} {
+      allow read, list: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid || isAdmin());
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }

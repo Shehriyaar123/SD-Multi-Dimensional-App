@@ -15,6 +15,8 @@ import {
   List as ListIcon
 } from 'lucide-react';
 import { problemService } from '../services/problemService';
+import { submissionService } from '../services/submissionService';
+import { auth } from '../../../firebase';
 import { Problem, Difficulty } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import ProblemSolver from './ProblemSolver';
@@ -26,8 +28,11 @@ const UserProblemList: React.FC = () => {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [difficultyFilter, setDifficultyFilter] = useState<string>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [solvedIds, setSolvedIds] = useState<Set<string>>(new Set());
   const [isDiffDropdownOpen, setIsDiffDropdownOpen] = useState(false);
   const [isCatDropdownOpen, setIsCatDropdownOpen] = useState(false);
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
   useEffect(() => {
     loadProblems();
@@ -36,10 +41,14 @@ const UserProblemList: React.FC = () => {
   const loadProblems = async () => {
     setLoading(true);
     try {
-      const data = await problemService.getAllProblems();
-      setProblems(data);
+      const [problemsData, solvedData] = await Promise.all([
+        problemService.getAllProblems(),
+        auth.currentUser ? submissionService.getUserSolvedProblemIds(auth.currentUser.uid) : Promise.resolve(new Set<string>())
+      ]);
+      setProblems(problemsData);
+      setSolvedIds(solvedData as Set<string>);
     } catch (error) {
-      console.error('Error loading problems:', error);
+      console.error('Error loading problems or progress:', error);
     } finally {
       setLoading(false);
     }
@@ -61,7 +70,13 @@ const UserProblemList: React.FC = () => {
                          p.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDiff = difficultyFilter === 'All' || p.difficulty === difficultyFilter;
     const matchesCat = categoryFilter === 'All' || p.category === categoryFilter;
-    return matchesSearch && matchesDiff && matchesCat;
+    
+    const isSolved = solvedIds.has(p.id);
+    const matchesStatus = statusFilter === 'All' || 
+                         (statusFilter === 'Solved' && isSolved) || 
+                         (statusFilter === 'Unsolved' && !isSolved);
+
+    return matchesSearch && matchesDiff && matchesCat && matchesStatus;
   });
 
   if (selectedProblem) {
@@ -100,13 +115,13 @@ const UserProblemList: React.FC = () => {
               </div>
               <div className="w-px h-12 bg-white/10" />
               <div className="flex flex-col">
-                <span className="text-3xl font-bold">45</span>
+                <span className="text-3xl font-bold">{solvedIds.size}</span>
                 <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Solved</span>
               </div>
               <div className="w-px h-12 bg-white/10" />
               <div className="flex flex-col">
-                <span className="text-3xl font-bold">12</span>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Contests</span>
+                <span className="text-3xl font-bold">{problems.length}</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Available</span>
               </div>
             </div>
           </div>
@@ -126,10 +141,44 @@ const UserProblemList: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Status Dropdown */}
+            <div className="relative w-full md:w-40">
+              <button 
+                onClick={() => { setIsStatusDropdownOpen(!isStatusDropdownOpen); setIsDiffDropdownOpen(false); setIsCatDropdownOpen(false); }}
+                className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/5 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all"
+              >
+                <span className="flex items-center gap-2">
+                  <CheckCircle2 className={`w-3.5 h-3.5 ${statusFilter === 'Solved' ? 'text-emerald-400' : 'text-gray-400'}`} />
+                  {statusFilter}
+                </span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {isStatusDropdownOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-white/10 rounded-2xl overflow-hidden z-50 shadow-2xl"
+                  >
+                    {['All', 'Solved', 'Unsolved'].map(status => (
+                      <button
+                        key={status}
+                        onClick={() => { setStatusFilter(status); setIsStatusDropdownOpen(false); }}
+                        className="w-full text-left px-4 py-3 text-sm hover:bg-blue-500/10 hover:text-blue-400 transition-all"
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {/* Difficulty Dropdown */}
             <div className="relative w-full md:w-40">
               <button 
-                onClick={() => { setIsDiffDropdownOpen(!isDiffDropdownOpen); setIsCatDropdownOpen(false); }}
+                onClick={() => { setIsDiffDropdownOpen(!isDiffDropdownOpen); setIsCatDropdownOpen(false); setIsStatusDropdownOpen(false); }}
                 className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/5 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all"
               >
                 <span className="flex items-center gap-2">
@@ -163,7 +212,7 @@ const UserProblemList: React.FC = () => {
             {/* Category Dropdown */}
             <div className="relative w-full md:w-48">
               <button 
-                onClick={() => { setIsCatDropdownOpen(!isCatDropdownOpen); setIsDiffDropdownOpen(false); }}
+                onClick={() => { setIsCatDropdownOpen(!isCatDropdownOpen); setIsDiffDropdownOpen(false); setIsStatusDropdownOpen(false); }}
                 className="w-full flex items-center justify-between px-4 py-3 bg-white/5 border border-white/5 rounded-2xl text-sm font-medium hover:bg-white/10 transition-all"
               >
                 <span className="flex items-center gap-2">
@@ -225,11 +274,18 @@ const UserProblemList: React.FC = () => {
                 <div className="space-y-6 relative z-10">
                   <div className="flex items-center justify-between">
                     <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500/10 transition-colors">
-                      <Code2 className="w-7 h-7 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                      <Code2 className={`w-7 h-7 transition-colors ${solvedIds.has(problem.id) ? 'text-emerald-400' : 'text-gray-400 group-hover:text-blue-400'}`} />
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getDifficultyColor(problem.difficulty)}`}>
-                      {problem.difficulty}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${getDifficultyColor(problem.difficulty)}`}>
+                        {problem.difficulty}
+                      </span>
+                      {solvedIds.has(problem.id) && (
+                        <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+                          <CheckCircle2 className="w-3 h-3" /> Solved
+                        </span>
+                      )}
+                    </div>
                   </div>
                   
                   <div>

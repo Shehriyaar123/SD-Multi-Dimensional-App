@@ -46,6 +46,16 @@ const SUPPORTED_LANGUAGES = [
 const ProblemForm: React.FC<ProblemFormProps> = ({ problem, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [showAiPrompt, setShowAiPrompt] = useState(false);
+  const [aiUserPrompt, setAiUserPrompt] = useState('');
+  const [generationSteps, setGenerationSteps] = useState([
+    { id: 'duplicates', label: 'Filtering existing problems', status: 'pending' },
+    { id: 'concept', label: 'Conceptualizing challenge', status: 'pending' },
+    { id: 'statement', label: 'Generating statement', status: 'pending' },
+    { id: 'testcases', label: 'Designing test cases', status: 'pending' },
+    { id: 'solution', label: 'Creating reference code', status: 'pending' },
+    { id: 'finalizing', label: 'Polishing editorial', status: 'pending' },
+  ]);
   const [moreTestCasesLoading, setMoreTestCasesLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'testcases' | 'editorial' | 'solutions' | 'templates'>('details');
   const [showPreview, setShowPreview] = useState(false);
@@ -118,14 +128,43 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ problem, onClose, onSuccess }
   };
 
   const handleGenerateAI = async () => {
-    if (!formData.title && !formData.category) {
-      alert('Please provide at least a title or category for AI to generate a problem.');
-      return;
-    }
-
     setAiLoading(true);
+    // Reset steps
+    setGenerationSteps(prev => prev.map(s => ({ ...s, status: 'pending' })));
+    
+    const updateStep = (id: string, status: 'pending' | 'loading' | 'completed' | 'error') => {
+      setGenerationSteps(prev => prev.map(s => s.id === id ? { ...s, status } : s));
+    };
+
     try {
-      const generated = await aiService.generateProblem(formData.title, formData.category, formData.difficulty);
+      updateStep('duplicates', 'loading');
+      // Fetch existing problems to avoid duplicates
+      const existingProblems = await problemService.getAllProblems();
+      updateStep('duplicates', 'completed');
+      
+      updateStep('concept', 'loading');
+      // Briefly simulate step transitions for UI feedback
+      await new Promise(r => setTimeout(r, 800));
+      updateStep('concept', 'completed');
+      updateStep('statement', 'loading');
+
+      const generated = await aiService.generateProblem(
+        aiUserPrompt, 
+        existingProblems,
+        formData.category, 
+        formData.difficulty
+      );
+      
+      updateStep('statement', 'completed');
+      updateStep('testcases', 'loading');
+      await new Promise(r => setTimeout(r, 600));
+      updateStep('testcases', 'completed');
+      updateStep('solution', 'loading');
+      await new Promise(r => setTimeout(r, 600));
+      updateStep('solution', 'completed');
+      updateStep('finalizing', 'loading');
+      await new Promise(r => setTimeout(r, 600));
+
       if (generated) {
         const testCasesWithIds = (generated.testCases || []).map((tc: any) => ({
           ...tc,
@@ -139,10 +178,17 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ problem, onClose, onSuccess }
           title: generated.title || prev.title,
           slug: (generated.title || prev.title).toLowerCase().replace(/\s+/g, '-')
         }));
+        updateStep('finalizing', 'completed');
+        
+        // Brief pause to let user see ticks before closing
+        await new Promise(r => setTimeout(r, 1000));
+        setShowAiPrompt(false);
+        setAiUserPrompt('');
       }
     } catch (error) {
       console.error('Error generating problem with AI:', error);
       alert('AI generation failed.');
+      setGenerationSteps(prev => prev.map(s => s.status === 'loading' ? { ...s, status: 'error' } : s));
     } finally {
       setAiLoading(false);
     }
@@ -247,13 +293,14 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ problem, onClose, onSuccess }
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={handleGenerateAI}
+            onClick={() => setShowAiPrompt(true)}
             disabled={aiLoading}
             className="flex items-center gap-2 px-4 py-2 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 rounded-xl transition-all border border-indigo-600/20 disabled:opacity-50"
           >
             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-            AI Generate
+            AI Auto-Generate
           </button>
+          <div className="h-8 w-px bg-white/10 mx-1" />
           <button 
             onClick={handleSave}
             disabled={loading}
@@ -288,6 +335,106 @@ const ProblemForm: React.FC<ProblemFormProps> = ({ problem, onClose, onSuccess }
           </button>
         ))}
       </div>
+
+      {/* AI Prompt Modal */}
+      <AnimatePresence>
+        {showAiPrompt && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-[#141414] border border-white/10 rounded-[32px] p-8 max-w-lg w-full shadow-2xl space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xl font-bold">What's the challenge?</h3>
+                </div>
+                <button onClick={() => setShowAiPrompt(false)} className="p-2 hover:bg-white/5 rounded-full text-gray-500 hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Describe the theme, topic, or specific DSA concept. AI will generate all fields, ensuring it doesn't duplicate existing problems.
+                </p>
+                
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-1">Target Difficulty</label>
+                  <div className="flex gap-2">
+                    {(['Easy', 'Medium', 'Hard'] as Difficulty[]).map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => setFormData({ ...formData, difficulty: level })}
+                        className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold transition-all border ${
+                          formData.difficulty === level 
+                            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' 
+                            : 'bg-white/5 border-white/10 text-gray-500 hover:border-white/20'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <textarea 
+                  value={aiUserPrompt}
+                  onChange={(e) => setAiUserPrompt(e.target.value)}
+                  placeholder="e.g. A problem about dynamic programming and trees involving path sum..."
+                  rows={4}
+                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 focus:outline-none focus:border-indigo-500/50 transition-all resize-none text-sm"
+                  autoFocus
+                />
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  onClick={() => setShowAiPrompt(false)}
+                  disabled={aiLoading}
+                  className="flex-1 py-3 px-6 bg-white/5 hover:bg-white/10 text-gray-300 rounded-2xl font-bold transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleGenerateAI}
+                  disabled={aiLoading}
+                  className="flex-2 py-3 px-8 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {aiLoading ? 'Generating...' : 'Generate Everything'}
+                </button>
+              </div>
+
+              {aiLoading && (
+                <div className="space-y-3 p-6 bg-black/20 rounded-2xl border border-white/5 animate-in fade-in slide-in-from-bottom-4">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-indigo-500 animate-ping" />
+                    Generation Progress
+                  </p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {generationSteps.map((step) => (
+                      <div key={step.id} className="flex items-center justify-between group">
+                        <span className={`text-xs transition-colors ${step.status === 'completed' ? 'text-emerald-400' : step.status === 'loading' ? 'text-white' : 'text-gray-600'}`}>
+                          {step.label}
+                        </span>
+                        {step.status === 'completed' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
+                        {step.status === 'loading' && <Loader2 className="w-3.5 h-3.5 text-indigo-400 animate-spin" />}
+                        {step.status === 'error' && <AlertCircle className="w-3.5 h-3.5 text-rose-500" />}
+                        {step.status === 'pending' && <X className="w-3.5 h-3.5 text-gray-800" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Content */}
       <div className="flex-1 p-8 max-w-7xl mx-auto w-full space-y-8">

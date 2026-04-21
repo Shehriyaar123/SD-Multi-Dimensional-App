@@ -1,5 +1,5 @@
 {
-  "name": "Penta-App",
-  "description": "A 6-dimensional learning and career ecosystem featuring an AI Career Command Center, Global Study Platform, Elite Coding Arena, and Digital Knowledge Library.",
+  "name": "HexaCore",
+  "description": "A unified 6-dimensional ecosystem for global learning, elite coding, professional networking, career acceleration, digital knowledge mastery, and AI innovation.",
   "requestFramePermissions": ["microphone", "camera"]
 }

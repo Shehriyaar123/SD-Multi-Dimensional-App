@@ -51,5 +51,15 @@ export const problemService = {
   async deleteProblem(id: string): Promise<void> {
     const docRef = doc(db, PROBLEMS_COLLECTION, id);
     await deleteDoc(docRef);
+  },
+
+  async deleteProblems(ids: string[]): Promise<void> {
+    await Promise.all(ids.map(id => this.deleteProblem(id)));
+  },
+
+  async deleteAllProblems(): Promise<void> {
+    const q = query(collection(db, PROBLEMS_COLLECTION));
+    const snapshot = await getDocs(q);
+    await Promise.all(snapshot.docs.map(d => deleteDoc(d.ref)));
   }
 };

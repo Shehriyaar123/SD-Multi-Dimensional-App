@@ -16,6 +16,7 @@ interface PublicGroupsViewProps {
   onSendMessage: (text: string, file?: { url: string, name: string, type: string, size: number }, replyTo?: { id: string, text: string, senderName: string, senderId: string }, extraFields?: Partial<Message>) => void;
   onSendAIMessage?: (text: string) => void;
   onCreateGroup?: (name: string, topic: string, privacy: 'public' | 'private' | 'hidden') => void;
+  onLoadMoreMessages?: (chatId: string) => void;
 }
 
 export default function PublicGroupsView({
@@ -28,7 +29,8 @@ export default function PublicGroupsView({
   onSendMessage,
   onSendAIMessage,
   onCreateGroup,
-  onOpenSidebar
+  onOpenSidebar,
+  onLoadMoreMessages
 }: PublicGroupsViewProps & { onOpenSidebar?: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -129,6 +131,7 @@ export default function PublicGroupsView({
               onSendMessage={onSendMessage}
               onSendAIMessage={onSendAIMessage}
               onBack={() => setActiveChatId(null)}
+              onLoadMore={() => onLoadMoreMessages?.(activeChat.id)}
             />
           </div>
         ) : (

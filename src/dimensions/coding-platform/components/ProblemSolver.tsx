@@ -28,6 +28,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { aiService } from '../services/aiService';
+import { auth } from '../../../firebase';
+import { submissionService } from '../services/submissionService';
+import { Submission } from '../types';
 
 interface ProblemSolverProps {
   problem: Problem;
@@ -82,16 +85,45 @@ const ProblemSolver: React.FC<ProblemSolverProps> = ({ problem, onBack }) => {
   };
 
   const handleSubmit = async () => {
+    if (!auth.currentUser) {
+      alert("Please sign in to submit your solution.");
+      return;
+    }
+
     setIsSubmitting(true);
     
-    setTimeout(() => {
-      setResults({
-        status: 'Accepted',
-        runtime: 42,
-        memory: 12.4,
-        passed: problem.testCases.length,
-        total: problem.testCases.length
-      });
+    // Simulate grading delay
+    setTimeout(async () => {
+      const status = 'Accepted'; // In a real app, this would be determined by a grading engine
+      const passed = problem.testCases.length;
+      const total = problem.testCases.length;
+      
+      const resultData = {
+        status: status as any,
+        runtime: Math.floor(Math.random() * 50) + 10,
+        memory: Math.floor(Math.random() * 20) + 5,
+        passed,
+        total
+      };
+
+      setResults(resultData);
+
+      try {
+        await submissionService.createSubmission({
+          problemId: problem.id,
+          userId: auth.currentUser!.uid,
+          language,
+          code,
+          status: status as any,
+          runtime: resultData.runtime,
+          memory: resultData.memory,
+          testCasesPassed: passed,
+          totalTestCases: total
+        });
+      } catch (error) {
+        console.error("Failed to save submission:", error);
+      }
+
       setIsSubmitting(false);
     }, 2000);
   };

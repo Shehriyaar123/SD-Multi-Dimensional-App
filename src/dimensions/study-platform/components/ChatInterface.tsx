@@ -79,7 +79,20 @@ interface ChatInterfaceProps {
   onSendMessage: (text: string, file?: { url: string, name: string, type: string, size: number }, replyTo?: { id: string, text: string, senderName: string, senderId: string }, extraFields?: Partial<Message>) => void;
   onSendAIMessage?: (text: string) => void;
   onBack: () => void;
+  onLoadMore?: () => void;
 }
+
+const getEmojiCount = (text: string) => {
+  if (!text) return 0;
+  // This regex matches most emojis including ZWJ sequences and skin tones
+  const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+  const matches = text.match(emojiRegex);
+  const textWithoutEmojis = text.replace(emojiRegex, '').replace(/\s/g, '').trim();
+  if (textWithoutEmojis.length === 0 && matches) {
+    return matches.length;
+  }
+  return 0;
+};
 
 function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
   const errInfo: FirestoreErrorInfo = {
@@ -205,6 +218,7 @@ const DecryptedMessage = ({
   const [showMessageInfo, setShowMessageInfo] = useState(false);
   const [dropdownDirection, setDropdownDirection] = useState<'up' | 'down'>('down');
   const [dropdownAlignment, setDropdownAlignment] = useState<'left' | 'right'>('right');
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
   const actionButtonRef = useRef<HTMLButtonElement>(null);
   const { theme } = useSettings();
 
@@ -221,6 +235,19 @@ const DecryptedMessage = ({
 
       setDropdownDirection(spaceBelow < 250 && spaceAbove > spaceBelow ? 'up' : 'down');
       setDropdownAlignment(spaceRight < 200 ? 'right' : (spaceLeft < 200 ? 'left' : 'right'));
+      
+      // Calculate picker position for Portal
+      const top = spaceBelow < 450 && spaceAbove > spaceBelow 
+        ? rect.top - 410 // up
+        : rect.bottom + 10; // down
+      
+      let left = rect.left;
+      if (rect.left + 320 > window.innerWidth) {
+        left = window.innerWidth - 330;
+      }
+      if (left < 10) left = 10;
+      
+      setPickerPosition({ top, left });
     }
   }, [actionsOpenMsgId, msg.id]);
 
@@ -633,7 +660,14 @@ const DecryptedMessage = ({
         )}
 
         {decryptedText && (
-          <div className="text-sm md:text-base leading-relaxed break-words whitespace-pre-wrap p-2">
+          <div className={`leading-relaxed break-words whitespace-pre-wrap p-2 ${
+            (() => {
+              const count = getEmojiCount(decryptedText);
+              if (count === 1) return 'text-5xl md:text-6xl text-center py-4';
+              if (count === 2) return 'text-4xl md:text-5xl text-center py-3';
+              return 'text-sm md:text-base';
+            })()
+          }`}>
             {msg.text.startsWith('[SECURE]') && <Shield className="w-3 h-3 inline mr-1 text-emerald-400" />}
             {displayText}
           </div>
@@ -691,42 +725,45 @@ const DecryptedMessage = ({
 
           <AnimatePresence>
             {showEmojiPicker && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, y: dropdownDirection === 'up' ? 20 : -20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: dropdownDirection === 'up' ? 20 : -20 }}
-                className={`absolute ${dropdownDirection === 'up' ? 'bottom-full mb-4' : 'top-full mt-4'} ${dropdownAlignment === 'right' ? 'right-0' : 'left-0'} z-[60]`}
-              >
-                <div className="relative bg-surface rounded-2xl shadow-2xl border border-border p-1 overflow-hidden ring-1 ring-black/20">
-                  {/* Caret */}
-                  <div className={`absolute ${dropdownDirection === 'up' ? '-bottom-1' : '-top-1'} ${dropdownAlignment === 'right' ? 'right-3' : 'left-3'} w-2 h-2 bg-surface border-l border-t border-border rotate-[225deg] ${dropdownDirection === 'up' ? 'rotate-[45deg]' : 'rotate-[225deg]'} z-10`} />
-                  
-                  <div className="absolute top-2 right-2 z-10">
-                    <button 
-                      onClick={() => setShowEmojiPicker(false)}
-                      className="p-1.5 bg-bg/60 backdrop-blur-md text-muted hover:text-text rounded-full transition-colors border border-border"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="relative z-0">
-                    <EmojiPicker 
-                      onEmojiClick={(emoji) => {
-                        handleAction('react', emoji.emoji);
-                        setShowEmojiPicker(false);
-                      }}
-                      theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
-                      width={320}
-                      height={400}
-                      skinTonesDisabled
-                      searchDisabled={false}
-                      lazyLoadEmojis={true}
-                      previewConfig={{ showPreview: false }}
-                      autoFocusSearch={false}
-                    />
-                  </div>
+              <PortalModal>
+                <div 
+                  className="fixed z-[9999]"
+                  style={{ top: pickerPosition.top, left: pickerPosition.left }}
+                >
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: dropdownDirection === 'up' ? 20 : -20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: dropdownDirection === 'up' ? 20 : -20 }}
+                  >
+                    <div className="relative bg-surface rounded-2xl shadow-2xl border border-border p-1 ring-1 ring-black/20">
+                      <div className="absolute top-2 right-2 z-10">
+                        <button 
+                          onClick={() => setShowEmojiPicker(false)}
+                          className="p-1.5 bg-bg/60 backdrop-blur-md text-muted hover:text-text rounded-full transition-colors border border-border"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <div className="relative z-0">
+                        <EmojiPicker 
+                          onEmojiClick={(emoji) => {
+                            handleAction('react', emoji.emoji);
+                            setShowEmojiPicker(false);
+                          }}
+                          theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
+                          width={320}
+                          height={400}
+                          skinTonesDisabled
+                          searchDisabled={false}
+                          lazyLoadEmojis={true}
+                          previewConfig={{ showPreview: false }}
+                          autoFocusSearch={false}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
+              </PortalModal>
             )}
           </AnimatePresence>
         </div>
@@ -881,9 +918,12 @@ const MessageContent = (props: MessageContentProps) => {
   return <DecryptedMessage {...props} />;
 };
 
-export default function ChatInterface({ chat, isPublic, currentUser, messages, onSendMessage: onSendMessageProp, onSendAIMessage, onBack }: ChatInterfaceProps) {
+export default function ChatInterface({ chat, isPublic, currentUser, messages, onSendMessage: onSendMessageProp, onSendAIMessage, onBack, onLoadMore }: ChatInterfaceProps) {
   const [newMessage, setNewMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [inputEmojiPickerPos, setInputEmojiPickerPos] = useState({ top: 0, left: 0 });
+  const emojiPickerRef = useRef<HTMLDivElement>(null);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isBuddyOpen, setIsBuddyOpen] = useState(false);
@@ -925,6 +965,9 @@ export default function ChatInterface({ chat, isPublic, currentUser, messages, o
   const [isTyping, setIsTyping] = useState<Record<string, boolean>>({});
   const [isMeTyping, setIsMeTyping] = useState(false);
   const [pendingMessages, setPendingMessages] = useState<Message[]>([]);
+  const [isInitialScrollDone, setIsInitialScrollDone] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const lastScrollHeight = useRef(0);
 
   const displayMessages = useMemo(() => {
     const claimedTempIds = new Set<string>();
@@ -946,6 +989,64 @@ export default function ChatInterface({ chat, isPublic, currentUser, messages, o
 
     return [...confirmed, ...stillPending];
   }, [messages, pendingMessages]);
+
+  useEffect(() => {
+    setIsInitialScrollDone(false);
+  }, [chat?.id]);
+
+  useEffect(() => {
+    if (scrollContainerRef.current && !isInitialScrollDone && displayMessages.length > 0) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      setIsInitialScrollDone(true);
+    }
+  }, [displayMessages.length, isInitialScrollDone]);
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current || !onLoadMore || isLoadingMore) return;
+    
+    if (scrollContainerRef.current.scrollTop <= 50) {
+      lastScrollHeight.current = scrollContainerRef.current.scrollHeight;
+      setIsLoadingMore(true);
+      onLoadMore();
+      // Reset loading state after a delay to prevent multiple calls
+      setTimeout(() => setIsLoadingMore(false), 1000);
+    }
+  };
+
+  // Adjust scroll position after loading more messages to maintain context
+  useEffect(() => {
+    if (isLoadingMore && scrollContainerRef.current && lastScrollHeight.current > 0) {
+      const newHeight = scrollContainerRef.current.scrollHeight;
+      const heightDiff = newHeight - lastScrollHeight.current;
+      if (heightDiff > 0) {
+        scrollContainerRef.current.scrollTop = heightDiff;
+        lastScrollHeight.current = 0;
+      }
+    }
+  }, [displayMessages.length]);
+
+  // Close emoji picker and actions on click away
+  useEffect(() => {
+    const handleClickAway = (e: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node) && 
+          emojiButtonRef.current && !emojiButtonRef.current.contains(e.target as Node)) {
+        setShowEmojiPicker(false);
+      }
+    };
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickAway);
+
+      // Update position for input emoji picker
+      if (emojiButtonRef.current) {
+        const rect = emojiButtonRef.current.getBoundingClientRect();
+        setInputEmojiPickerPos({
+          top: rect.top - 410,
+          left: Math.min(rect.left, window.innerWidth - 330)
+        });
+      }
+    }
+    return () => document.removeEventListener('mousedown', handleClickAway);
+  }, [showEmojiPicker]);
 
   const onSendMessage = async (text: string, file?: any, replyTo?: any, extraFields?: any) => {
     const tempId = 'temp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
@@ -2429,11 +2530,17 @@ export default function ChatInterface({ chat, isPublic, currentUser, messages, o
       </div>
 
       {/* Messages Area */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar">
+      <div 
+        ref={scrollContainerRef} 
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 custom-scrollbar"
+      >
         <AnimatePresence initial={false}>
           {displayMessages.filter(msg => !msg.deletedFor?.includes(currentUser.id)).map((msg, index, filteredArray) => {
             const isMe = msg.senderId === currentUser.id;
             const isAi = msg.senderId === 'ai-assistant';
+            const eCount = getEmojiCount(msg.text.startsWith('[SECURE]') ? '' : msg.text); // Simplified check, DecryptedMessage handles it better but we need it here for bubble styling
+            const isPlainEmoji = eCount > 0 && eCount <= 2;
             
             let isSeenByAny = false;
             if (isMe && chat?.lastRead && msg.createdAt) {
@@ -2479,7 +2586,7 @@ export default function ChatInterface({ chat, isPublic, currentUser, messages, o
                       {isAi ? <Sparkles className="w-5 h-5" /> : <img src={msg.avatar} alt={nicknames[msg.senderId] || msg.senderName} className="w-full h-full object-cover" referrerPolicy="no-referrer" />}
                     </div>
                   )}
-                  <div className={`${(msg.fileUrl && (isImage(msg.fileType, msg.fileUrl, msg.fileName) || isVideo(msg.fileType, msg.fileUrl, msg.fileName))) || msg.type === 'mediaGroup' ? 'p-1' : 'p-3 md:p-4'} rounded-2xl ${isMe ? `bg-gradient-to-br ${chat.bubbleTheme || 'from-primary to-primary/80'} text-white rounded-tr-none shadow-lg shadow-primary/10` : isAi ? 'bg-surface/80 text-text border border-primary/30 rounded-tl-sm' : 'bg-surface text-text rounded-tl-sm border border-border/50'} relative peer group transition-all duration-200 hover:shadow-xl`}>
+                  <div className={`${(msg.fileUrl && (isImage(msg.fileType, msg.fileUrl, msg.fileName) || isVideo(msg.fileType, msg.fileUrl, msg.fileName))) || msg.type === 'mediaGroup' ? 'p-1' : (isPlainEmoji ? 'p-0' : 'p-3 md:p-4')} rounded-2xl ${isPlainEmoji ? 'bg-transparent shadow-none border-none' : (isMe ? `bg-gradient-to-br ${chat.bubbleTheme || 'from-primary to-primary/80'} text-white rounded-tr-none shadow-lg shadow-primary/10` : isAi ? 'bg-surface/80 text-text border border-primary/30 rounded-tl-sm' : 'bg-surface text-text rounded-tl-sm border border-border/50')} relative peer group transition-all duration-200 hover:shadow-xl`}>
                     <MessageContent 
                       msg={msg} 
                       currentUser={currentUser}
@@ -2747,15 +2854,57 @@ export default function ChatInterface({ chat, isPublic, currentUser, messages, o
               />
             )}
           </div>
-          <button 
-            type="button" 
-            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            disabled={isRecording}
-            className="p-2 md:p-3 text-muted hover:text-text hover:bg-bg rounded-xl transition-colors shrink-0 disabled:opacity-50"
-            title="Emoji"
-          >
-            <Smile className="w-5 h-5" />
-          </button>
+          <div className="relative shrink-0">
+            <button 
+              ref={emojiButtonRef}
+              type="button" 
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              disabled={isRecording}
+              className="p-2 md:p-3 text-muted hover:text-text hover:bg-bg rounded-xl transition-colors shrink-0 disabled:opacity-50"
+              title="Emoji"
+            >
+              <Smile className="w-5 h-5" />
+            </button>
+            <AnimatePresence>
+              {showEmojiPicker && (
+                <PortalModal>
+                  <div 
+                    className="fixed z-[9999]" 
+                    style={{ top: inputEmojiPickerPos.top, left: inputEmojiPickerPos.left }}
+                  >
+                    <motion.div 
+                      ref={emojiPickerRef}
+                      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    >
+                      <div className="bg-surface rounded-2xl border border-border shadow-2xl p-1 relative">
+                        <div className="absolute top-2 right-2 z-10">
+                          <button 
+                            onClick={() => setShowEmojiPicker(false)}
+                            className="p-1.5 bg-bg/60 backdrop-blur-md text-muted hover:text-text rounded-full transition-colors border border-border"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <EmojiPicker 
+                          onEmojiClick={(emojiData) => {
+                            setNewMessage(prev => prev + emojiData.emoji);
+                          }}
+                          theme={theme === 'dark' ? Theme.DARK : Theme.LIGHT}
+                          width={320}
+                          height={400}
+                          skinTonesDisabled
+                          lazyLoadEmojis
+                          previewConfig={{ showPreview: false }}
+                        />
+                      </div>
+                    </motion.div>
+                  </div>
+                </PortalModal>
+              )}
+            </AnimatePresence>
+          </div>
           
           {isRecording ? (
             <div className="flex-1 bg-primary/10 border border-primary/30 rounded-xl px-3 py-2 flex items-center justify-between animate-in fade-in slide-in-from-bottom-2">

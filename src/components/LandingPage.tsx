@@ -25,7 +25,14 @@ import {
   BarChart3,
   X,
   Sun,
-  Moon
+  Moon,
+  MousePointer2,
+  ExternalLink,
+  ArrowUpRight,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause
 } from "lucide-react";
 import { useRef, useState, useEffect, ReactNode, MouseEvent } from "react";
 import { Link } from "react-router-dom";
@@ -38,8 +45,9 @@ const dimensions = [
     title: "Global Study Platform",
     headline: "Learn without Borders",
     description: "A borderless learning ecosystem connecting mentors and peers globally with AI-driven personalization.",
-    fullDescription: "Dive into a learning environment that adapts to you. Our platform leverages advanced neural networks to match you with peers and mentors who complement your cognitive style, ensuring every session is productive. Whether you're upskilling for a new career or diving deep into academic research, the Global Study Platform provides the tools, community, and global perspective to accelerate your journey. We've dismantled geographical barriers to create a truly universal classroom.",
+    fullDescription: "Dive into a learning environment that adapts to you. Our platform leverages advanced neural networks to match you with peers and mentors who complement your cognitive style, ensuring every session is productive.",
     icon: Globe,
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000",
     color: "from-blue-600 to-cyan-400",
     accent: "#3b82f6",
     details: ["Global Peer Interaction", "AI-Curated Learning Paths", "Real-time Skill Gap Analysis"],
@@ -64,8 +72,9 @@ const dimensions = [
     title: "Elite Coding Arena",
     headline: "Code. Compete. Conquer.",
     description: "High-stakes coding battles and industry-standard project simulations with real-time feedback.",
-    fullDescription: "Sharpen your skills in the ultimate gladiatorial arena for developers. This isn't just about solving problems; it's about simulating the high-pressure environments of top tech firms. With support for over 24 languages and an AI judge that reviews not just your output but your code quality and architecture, the Arena ensures you're not just employable—you're exceptional. Battle head-to-head, collaborate in real-time pair programming sessions, and build a portfolio that speaks volumes.",
+    fullDescription: "Sharpen your skills in the ultimate gladiatorial arena for developers. Simulate high-pressure environments of top tech firms with support for over 24 languages and AI-driven code quality analysis.",
     icon: Code,
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000",
     color: "from-purple-600 to-pink-500",
     accent: "#9333ea",
     details: ["Competitive Hackathons", "Live Pair Programming", "Industry Project Simulations"],
@@ -90,8 +99,9 @@ const dimensions = [
     title: "Resume Architect",
     headline: "Your Story, Optimized.",
     description: "AI-driven career narrative transformation optimized for impact and ATS visibility.",
-    fullDescription: "Transform your professional narrative with the power of advanced NLP. The Resume Architect doesn't just format your history; it analyzes job descriptions, identifies semantic keywords, and reconstructs your experience to maximize impact. Navigate the black box of Applicant Tracking Systems (ATS) with confidence. With dynamic portfolio integration and one-click tailoring, you'll never send a generic application again. Make every word count towards your next big opportunity.",
+    fullDescription: "Transform your professional narrative with the power of advanced NLP. Analyze job descriptions, identify semantic keywords, and reconstruct your experience to maximize impact.",
     icon: FileText,
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&q=80&w=1000",
     color: "from-orange-600 to-red-500",
     accent: "#ea580c",
     details: ["ATS Optimization AI", "Dynamic Portfolio Builder", "Industry-Specific Templates"],
@@ -116,8 +126,9 @@ const dimensions = [
     title: "Verified Job Network",
     headline: "Trust in Recruitment.",
     description: "The gold standard of recruitment with manual verification for every company and post.",
-    fullDescription: "Enter a job market where trust is the currency, not a gamble. In an era of scams and ghost jobs, the Verified Job Network stands as the beacon of integrity. Every company undergoes rigorous KYC verification, and every salary benchmark is backed by real, blockchain-verified data. We connect talent directly with decision-makers, bypassing the noise of traditional recruiting. It’s not just about finding a job; it’s about finding the *right* role, transparently.",
+    fullDescription: "Enter a job market where trust is the currency. Every company undergoes rigorous KYC verification, and every salary benchmark is backed by real, blockchain-verified data.",
     icon: Briefcase,
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000",
     color: "from-emerald-600 to-teal-500",
     accent: "#10b981",
     details: ["KYC Verified Companies", "Direct Talent Sourcing", "Transparent Hiring Pipeline"],
@@ -139,29 +150,57 @@ const dimensions = [
   },
   {
     id: 5,
-    title: "Digital Knowledge Library",
+    title: "Knowledge Library",
     headline: "The World's Mind.",
     description: "The world's knowledge indexed by intent with natural language query support.",
-    fullDescription: "Forget keyword matching; ask questions as if you were speaking to a human. The Digital Knowledge Library indexes the world's research, tutorials, and documentation using vector embeddings, allowing for semantic search that understands *intent*. Synthesize information from thousands of sources instantly, visualize complex concepts in 3D, and access the world's repository of truth with zero friction. It is the ultimate research assistant, available 24/7.",
+    fullDescription: "Ask questions as if you were speaking to a human. Our library indexes research, tutorials, and documentation using vector embeddings for semantic search that understands intent.",
     icon: Library,
+    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=1000",
     color: "from-indigo-600 to-violet-500",
     accent: "#6366f1",
-    details: ["Semantic Search Engine", "Interactive 3D Modules", "Research Paper Repository"],
-    stat: "2M+ Resources",
+    details: ["Semantic Search Engine", "3D Concept Visualization", "Multi-Source Information Synthesis"],
+    stat: "2B+ Data Points",
     status: "Indexing Live",
     uptime: "99.99%",
     metrics: [
-      { label: "Queries", value: "5M/D" },
-      { label: "Papers", value: "1.4M" },
-      { label: "Accuracy", value: "96%" },
-      { label: "Latency", value: "120ms" }
+      { label: "Resources", value: "5M+" },
+      { label: "Queries/sec", value: "1.2K" },
+      { label: "Accuracy", value: "99.2%" },
+      { label: "Sources", value: "15K" }
     ],
     features: [
-      { title: "Vector Indexing", desc: "Sub-second semantic retrieval." },
-      { title: "LLM Synthesis", desc: "Combine multiple sources instantly." },
-      { title: "3D Visualization", desc: "Interactive scientific concepts." }
+      { title: "Intent Analysis", desc: "Understands the 'why' behind your search." },
+      { title: "Knowledge Graphs", desc: "Visualizes connections between topics." },
+      { title: "Auto-Summarization", desc: "Get the gist of long papers instantly." }
     ],
-    technical: "Vector DB | LLM Synthesis | WebGL Rendering"
+    technical: "Vector Search | Knowledge Graph | LLM Summarization"
+  },
+  {
+    id: 6,
+    title: "AI Innovation Lab",
+    headline: "Build the Future.",
+    description: "A sandbox for deploying and testing custom AI models with distributed GPU compute.",
+    fullDescription: "Unleash the power of frontier models. Our Innovation Lab provides a high-performance sandbox for training, fine-tuning, and deploying custom AI solutions with zero infrastructure overhead.",
+    icon: BrainCircuit,
+    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1000",
+    color: "from-red-600 to-orange-500",
+    accent: "#ef4444",
+    details: ["Distributed GPU Compute", "Model Fine-tuning Suite", "Real-time Inference API"],
+    stat: "500+ Models Deployed",
+    status: "Compute Ready",
+    uptime: "99.97%",
+    metrics: [
+      { label: "Compute", value: "12.5 PFLOPS" },
+      { label: "Models", value: "500+" },
+      { label: "Latency", value: "45ms" },
+      { label: "Uptime", value: "99.9%" }
+    ],
+    features: [
+      { title: "Auto-Scaling", desc: "Compute that grows with your model." },
+      { title: "Dataset Curation", desc: "AI-assisted data cleaning and labeling." },
+      { title: "One-Click Deploy", desc: "Go from notebook to API in seconds." }
+    ],
+    technical: "CUDA | Distributed Training | Serverless GPU"
   }
 ];
 
@@ -187,434 +226,512 @@ const testimonials = [
 
 // --- COMPONENTS ---
 
-function FloatingElement({ children, className }: { children: ReactNode, className?: string }) {
+function TiltCard({ children, className }: { children: ReactNode, className?: string }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.01 }}
-      transition={{ type: "spring", stiffness: 200, damping: 15 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
       className={className}
     >
-      {children}
+      <div style={{ transform: "translateZ(50px)", transformStyle: "preserve-3d" }}>
+        {children}
+      </div>
     </motion.div>
+  );
+}
+
+// --- CUSTOM HOOKS ---
+function useWindowSize() {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return size;
+}
+
+function VideoScrub({ scrollYProgress, isPaused, isMuted }: { scrollYProgress: any, isPaused: boolean, isMuted: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { width } = useWindowSize();
+  const isMobile = width < 1024;
+
+  // Map scroll progress to video time
+  // We'll use the first 20% of the total scroll for the video scrubbing
+  const videoTime = useTransform(scrollYProgress, [0, 0.2], [0, 5]); // Assuming a 5s loopable video
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const unsubscribe = videoTime.on("change", (latest) => {
+      if (videoRef.current) {
+        // Use requestAnimationFrame for smoother scrubbing
+        requestAnimationFrame(() => {
+          if (videoRef.current) {
+            videoRef.current.currentTime = latest;
+          }
+        });
+      }
+    });
+    return () => unsubscribe();
+  }, [videoTime, isPaused]);
+
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden">
+      <video
+        ref={videoRef}
+        src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-a-circuit-board-1664-large.mp4"
+        muted={isMuted}
+        playsInline
+        className="w-full h-full object-cover opacity-30 grayscale transition-opacity duration-1000"
+        style={{ opacity: isPaused ? 0.1 : 0.3 }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505]" />
+    </div>
+  );
+}
+
+function DimensionScene({ 
+  dimension, 
+  index
+}: { 
+  dimension: typeof dimensions[0], 
+  index: number
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { width } = useWindowSize();
+  const isMobile = width < 1024;
+  
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  // Local progress for the "active" part of the section (when it's in the middle)
+  const { scrollYProgress: activeProgress } = useScroll({
+    target: ref,
+    offset: ["start center", "end center"]
+  });
+
+  const progress = useSpring(activeProgress, { stiffness: 50, damping: 20 });
+  
+  // Extreme 3D Camera/Object Transformations (Entrance Only)
+  const rotateY = useTransform(progress, [0, 0.5], [isMobile ? -45 : -90, 0]);
+  const rotateX = useTransform(progress, [0, 0.5], [isMobile ? 15 : 30, 0]);
+  const z = useTransform(progress, [0, 0.5], [-1000, 0]);
+  const opacity = useTransform(progress, [0, 0.2], [0, 1]);
+  const scale = useTransform(progress, [0, 0.5], [0.8, 1]);
+
+  // "Transformer" assembly parts (Entrance Only)
+  const borderOffset = useTransform(progress, [0, 0.4], [300, 0]);
+  const iconScale = useTransform(progress, [0.3, 0.45, 0.5], [0, 1.2, 1]);
+  const textFlyIn = useTransform(progress, [0, 0.5], [isMobile ? 50 : 200, 0]);
+
+  return (
+    <section ref={ref} id={`dimension-${index}`} className="relative min-h-[200vh] w-full">
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden">
+        <motion.div 
+          style={{ opacity, z, scale, rotateY, rotateX, transformStyle: "preserve-3d" }}
+          className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center px-6 pointer-events-none"
+        >
+          {/* 3D Visual Side */}
+          <div className="relative flex justify-center items-center perspective-[2000px] transform-style-3d">
+            <motion.div 
+              style={{ scale: useTransform(progress, [0.4, 0.5], [0.8, 1]) }}
+              className={`absolute -inset-20 bg-gradient-to-br ${dimension.color} opacity-20 blur-[120px] rounded-full`} 
+            />
+            
+            <TiltCard className="relative w-full max-w-[320px] lg:max-w-none aspect-[16/10] rounded-[32px] lg:rounded-[40px] overflow-hidden border border-white/10 shadow-2xl pointer-events-auto">
+              <motion.img 
+                src={dimension.image} 
+                alt={dimension.title} 
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+                style={{ transform: "translateZ(30px) scale(1.1)" }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              
+              <motion.div 
+                style={{ x: borderOffset, transform: "translateZ(100px)" }}
+                className="absolute top-6 right-6 lg:top-8 lg:right-8 w-16 h-16 lg:w-24 lg:h-24 border-t-2 border-r-2 border-white/40 rounded-tr-2xl lg:rounded-tr-3xl"
+              />
+              <motion.div 
+                style={{ x: useTransform(progress, [0, 0.5], [-300, 0]), transform: "translateZ(100px)" }}
+                className="absolute bottom-6 left-6 lg:bottom-8 lg:left-8 w-16 h-16 lg:w-24 lg:h-24 border-b-2 border-l-2 border-white/40 rounded-bl-2xl lg:rounded-bl-3xl"
+              />
+
+              <div className="absolute bottom-6 left-6 lg:bottom-10 lg:left-10" style={{ transform: "translateZ(150px)" }}>
+                <motion.div 
+                  style={{ scale: iconScale }}
+                  className="w-12 h-12 lg:w-16 lg:h-16 rounded-xl lg:rounded-2xl bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center mb-4 lg:mb-6"
+                >
+                  <dimension.icon className="w-6 h-6 lg:w-8 lg:h-8 text-white" />
+                </motion.div>
+                <h3 className="text-3xl lg:text-6xl font-display font-black tracking-tighter text-white leading-none">{dimension.title}</h3>
+              </div>
+            </TiltCard>
+          </div>
+
+          {/* Content Side */}
+          <motion.div 
+            style={{ x: textFlyIn, transform: "translateZ(200px)" }}
+            className="space-y-6 lg:space-y-10 text-center lg:text-left pointer-events-auto"
+          >
+            <div className="space-y-4 lg:space-y-6">
+              <div className="flex items-center justify-center lg:justify-start gap-4">
+                <div className="h-px w-8 lg:w-12 bg-white/40" />
+                <span className="text-[10px] lg:text-xs font-bold uppercase tracking-[0.5em] text-white/60">Dimension 0{dimension.id}</span>
+              </div>
+              <h2 className="text-4xl lg:text-8xl font-display font-black tracking-tighter leading-[0.85] text-white">
+                {dimension.headline.split(' ').map((word, i) => (
+                  <motion.span 
+                    key={i} 
+                    className="inline-block mr-3 lg:mr-4"
+                    style={{ 
+                      y: useTransform(progress, [0.3 + (i * 0.05), 0.5], [30, 0]),
+                      opacity: useTransform(progress, [0.3 + (i * 0.05), 0.5], [0, 1])
+                    }}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </h2>
+              <p className="text-lg lg:text-3xl text-white/80 leading-tight font-light italic max-w-xl mx-auto lg:mx-0">
+                "{dimension.description}"
+              </p>
+              <p className="text-white/40 leading-relaxed text-xs lg:text-xl max-w-lg mx-auto lg:mx-0 font-light">
+                {dimension.fullDescription}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-8">
+              {dimension.features.map((f, i) => (
+                <motion.div 
+                  key={i}
+                  style={{ 
+                    x: useTransform(progress, [0.4 + (i * 0.1), 0.6], [50, 0]),
+                    opacity: useTransform(progress, [0.4 + (i * 0.1), 0.6], [0, 1])
+                  }}
+                  className="space-y-1 lg:space-y-2 group"
+                >
+                  <div className="flex items-center justify-center lg:justify-start gap-2 lg:gap-3">
+                    <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-white/60 group-hover:bg-white transition-all group-hover:scale-150" />
+                    <h4 className="text-[10px] lg:text-sm font-bold uppercase tracking-widest text-white/90">{f.title}</h4>
+                  </div>
+                  <p className="text-[8px] lg:text-xs text-white/30 leading-relaxed uppercase tracking-widest pl-4 lg:pl-5">{f.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
   );
 }
 
 export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [activeDimension, setActiveDimension] = useState(0);
+  const { width, height } = useWindowSize();
+  const isMobile = width < 1024;
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 50,
+    damping: 20,
+    restDelta: 0.001
+  });
+
   const [isDocOpen, setIsDocOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [isVideoPaused, setIsVideoPaused] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const { theme, setTheme } = useSettings();
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
-  // Mouse tracking for global glow
   useEffect(() => {
-    const handleMouseMove = (e: globalThis.MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Scroll logic for Progress Bar
-  const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-
   return (
-    <div ref={containerRef} className="relative bg-bg text-text min-h-screen overflow-x-hidden selection:bg-blue-500/30 transition-colors duration-300">
-      
-      {/* CSS for Smooth Scroll Snap & Noise */}
+    <div ref={containerRef} className="relative bg-[#050505] text-white selection:bg-white/30">
       <style>{`
-        html { scroll-behavior: smooth; }
-        .snap-section { scroll-snap-align: start; scroll-snap-stop: always; }
-        .noise { background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"); }
-        .mask-gradient { mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;700;900&display=swap');
+        .font-display { font-family: 'Outfit', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        body { overflow-x: hidden; background: #050505; }
+        .transform-style-3d { transform-style: preserve-3d; }
       `}</style>
 
-      {/* Scroll Progress Bar */}
-      <motion.div style={{ scaleX }} className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left z-[100]" />
-
-      {/* Dynamic Cursor Glow */}
-      <motion.div 
-        className="fixed w-[600px] h-[600px] rounded-full pointer-events-none z-0 opacity-30 blur-[120px] transition-colors duration-500"
-        animate={{ x: mousePos.x - 300, y: mousePos.y - 300 }}
-        transition={{ type: "spring", damping: 20, stiffness: 50 }}
-        style={{ background: dimensions[activeDimension]?.accent || "#3b82f6" }}
-      />
-
-      {/* Static Background Gradients */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[50%] h-[50%] bg-blue-900/20 blur-[150px] rounded-full" />
-        <div className="absolute bottom-0 right-0 w-[40%] h-[40%] bg-purple-900/20 blur-[150px] rounded-full" />
-      </div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center max-w-7xl mx-auto">
-        <motion.div className="flex items-center gap-3 group cursor-pointer">
-          <div className="w-10 h-10 bg-text text-bg rounded-lg flex items-center justify-center font-display font-bold text-lg shadow-lg shadow-text/10 group-hover:rounded-xl transition-all duration-300">P</div>
-          <span className="font-display font-bold text-xl tracking-tight">PENTA</span>
-        </motion.div>
+      {/* --- NAVIGATION --- */}
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-4 lg:px-8 py-4 lg:py-6 flex justify-between items-center ${scrolled ? 'bg-black/60 backdrop-blur-2xl border-b border-white/5' : ''}`}>
+        <div className="flex items-center gap-2 lg:gap-3">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 bg-white rounded-lg flex items-center justify-center">
+            <Layers className="w-5 h-5 lg:w-6 lg:h-6 text-black" />
+          </div>
+          <span className="text-lg lg:text-xl font-display font-black tracking-tighter uppercase">HexaCore</span>
+        </div>
         
-        <div className="flex items-center gap-4">
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme}
-            className="p-2.5 bg-surface text-text rounded-full border border-border hover:border-text/30 backdrop-blur-md transition-all"
-          >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </motion.button>
+        <div className="hidden xl:flex items-center gap-8">
+          {dimensions.map((dim, idx) => (
+            <button 
+              key={dim.id} 
+              onClick={() => {
+                const element = document.getElementById(`dimension-${idx}`);
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/30 hover:text-white transition-colors"
+            >
+              Dim 0{dim.id}
+            </button>
+          ))}
+        </div>
 
+        <div className="flex items-center gap-4">
           <Link to="/login">
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-2.5 bg-surface text-text rounded-full text-xs font-bold border border-border hover:border-text/30 backdrop-blur-md transition-colors"
+              className="px-5 lg:px-7 py-2 lg:py-2.5 bg-white text-black text-[9px] lg:text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg shadow-white/10"
             >
-              Launch App
+              Access Portal
             </motion.button>
           </Link>
         </div>
       </nav>
 
-      {/* --- SECTION 1: HERO --- */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 z-10 snap-section">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-5xl"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface border border-border text-muted text-xs font-medium mb-8 backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-            </span>
-            Now in Public Beta
-          </div>
-          
-          <h1 className="text-6xl sm:text-8xl font-display font-bold tracking-tighter leading-[0.9] mb-8">
-            REDEFINE <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">POSSIBILITY</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-muted max-w-2xl mx-auto mb-12 leading-relaxed font-light">
-            A unified ecosystem where global learning, competitive coding, and professional growth converge into a single, AI-driven experience.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/login">
-              <motion.button 
-                whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(var(--text-rgb),0.2)" }}
-                className="px-8 py-4 bg-text text-bg font-bold rounded-full hover:shadow-lg transition-all flex items-center gap-3 group"
-              >
-                Enter the Ecosystem <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </motion.button>
-            </Link>
-            <button 
-              onClick={() => setIsDocOpen(true)}
-              className="text-muted hover:text-text font-medium transition-all flex items-center gap-3 group"
-            >
-              View Documentation <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </motion.div>
+      {/* --- GLOBAL BACKGROUND --- */}
+      <div className="fixed inset-0 z-0">
+        <VideoScrub scrollYProgress={smoothProgress} isPaused={isVideoPaused} isMuted={isVideoMuted} />
+      </div>
 
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-16 flex flex-col items-center gap-4 text-muted"
-        >
-          <span className="text-xs uppercase tracking-widest">Scroll to Explore</span>
-          <div className="w-px h-12 bg-gradient-to-b from-text/20 to-transparent" />
-        </motion.div>
-      </section>
-
-      {/* --- SECTION 2: STATS --- */}
-      <section className="relative z-10 py-20 border-t border-b border-border bg-surface/20 backdrop-blur-lg snap-section">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12">
-          {stats.map((stat, i) => (
+      {/* --- SCROLLING CONTENT (LONG PAGE) --- */}
+      <div className="relative z-10 perspective-[2000px] transform-style-3d">
+        
+        {/* Welcome Intro */}
+        <section className="h-screen flex flex-col items-center justify-center text-center px-6 relative overflow-hidden">
+          <motion.div 
+            style={{ 
+              opacity: useTransform(smoothProgress, [0, 0.05], [1, 0]),
+              z: useTransform(smoothProgress, [0, 0.05], [0, 500]),
+              rotateX: useTransform(smoothProgress, [0, 0.05], [0, 20]),
+            }}
+            className="space-y-6"
+          >
             <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-100px" }}
-              transition={{ delay: i * 0.1, duration: 0.8 }}
-              className="text-center"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="inline-block px-6 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-xl text-xs font-bold uppercase tracking-[0.5em] text-white/80 mb-8"
             >
-              <stat.icon className="w-6 h-6 mx-auto mb-4 text-muted" />
-              <div className="text-4xl md:text-5xl font-display font-black mb-2 tracking-tighter">{stat.value}</div>
-              <div className="text-xs uppercase tracking-widest text-muted font-medium">{stat.label}</div>
+              The 6th Dimension
             </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- SECTION 3: DIMENSIONS (Enhanced) --- */}
-      <section className="relative z-10 py-20 px-4 md:px-6 max-w-7xl mx-auto snap-section">
-        <div className="mb-16 text-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: false }}
-            className="text-blue-500 font-bold text-sm uppercase tracking-[0.3em] mb-4"
-          >
-            Core Architecture
-          </motion.div>
-          <h2 className="text-4xl md:text-6xl font-display font-black tracking-tighter">Five Dimensions.</h2>
-          <h2 className="text-4xl md:text-6xl font-display font-black tracking-tighter text-muted">One Ecosystem.</h2>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {dimensions.map((dim, idx) => (
-            <motion.div
-              key={dim.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, margin: "-50px" }}
-              onHoverStart={() => setActiveDimension(idx)}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className={`group relative bg-surface/40 border border-border hover:border-text/30 transition-all duration-500 rounded-3xl overflow-hidden ${idx === 0 ? 'lg:col-span-2' : ''}`}
-            >
-              {/* Top Gradient Line */}
-              <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${dim.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-              
-              <div className="p-8 flex flex-col h-full">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${dim.color} flex items-center justify-center shadow-lg`} style={{ boxShadow: `0 10px 30px -10px ${dim.accent}` }}>
-                      <dim.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className={`text-xs font-bold uppercase tracking-widest bg-gradient-to-r ${dim.color} bg-clip-text text-transparent`}>{dim.headline}</p>
-                      <h3 className="text-xl font-display font-black tracking-tight">{dim.title}</h3>
-                    </div>
-                  </div>
-                  <div className="text-xs font-mono text-muted font-bold">0{dim.id}</div>
-                </div>
-                
-                {/* Rich Description Paragraph */}
-                <p className="text-muted text-sm leading-relaxed mb-8 flex-grow">
-                  {dim.fullDescription}
-                </p>
-
-                {/* Feature Grid (Instead of simple list) */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                  {dim.features.map((f, i) => (
-                    <div key={i} className="bg-bg/30 rounded-xl p-4 border border-border group-hover:border-text/10 transition-colors">
-                      <h4 className="font-bold text-text text-sm mb-1">{f.title}</h4>
-                      <p className="text-muted text-xs">{f.desc}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Footer Stats */}
-                <div className="flex justify-between items-end border-t border-border pt-6">
-                  <div className="flex gap-6">
-                    {dim.metrics.slice(0, 2).map((m, i) => (
-                      <div key={i}>
-                        <div className="text-xl font-display font-black text-text">{m.value}</div>
-                        <div className="text-[10px] uppercase tracking-wider text-muted">{m.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted bg-surface/50 px-3 py-1.5 rounded-full">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    {dim.status}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* --- SECTION 4: BENTO FEATURES --- */}
-      <section className="relative z-10 py-20 px-4 md:px-6 max-w-7xl mx-auto snap-section">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Large Card - Global Connectivity */}
-          <motion.div 
-            whileInView={{ opacity: 1, scale: 1 }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.8 }}
-            className="md:col-span-2 p-10 rounded-3xl bg-gradient-to-br from-surface to-surface/50 border border-border flex flex-col justify-between relative overflow-hidden group min-h-[400px]"
-          >
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_120%,_rgba(59,130,246,0.3),_transparent_70%)] group-hover:opacity-30 transition-opacity" />
-            <div>
-              <Globe2 className="w-10 h-10 text-blue-500 mb-6" />
-              <h3 className="text-3xl font-display font-black mb-3">Global Connectivity</h3>
-              <p className="text-muted max-w-md leading-relaxed">Our network spans 180+ countries, connecting you with the brightest minds and most innovative firms globally.</p>
-            </div>
-            <div className="flex gap-4 mt-8">
-               <div className="h-1 w-16 bg-blue-500 rounded-full" />
-               <div className="h-1 w-8 bg-border rounded-full" />
-            </div>
-          </motion.div>
-
-          {/* Small Card - Security */}
-          <motion.div 
-            whileInView={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 20 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="p-10 rounded-3xl bg-gradient-to-br from-surface to-surface/50 border border-border flex flex-col justify-between min-h-[400px] group"
-          >
-            <ShieldCheck className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform" />
-            <div>
-              <h3 className="text-2xl font-display font-black mb-2">Admin Verified</h3>
-              <p className="text-muted text-sm leading-relaxed">Every recruiter and firm is manually verified by our elite admin team to ensure 100% trust.</p>
-            </div>
-          </motion.div>
-
-          {/* Small Card - AI Intelligence */}
-          <motion.div 
-            whileInView={{ opacity: 1, y: 0 }}
-            initial={{ opacity: 0, y: 20 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="p-10 rounded-3xl bg-gradient-to-br from-surface to-surface/50 border border-border flex flex-col justify-between min-h-[400px] group"
-          >
-            <BrainCircuit className="w-10 h-10 text-purple-500 group-hover:rotate-12 transition-transform" />
-            <div>
-              <h3 className="text-2xl font-display font-black mb-2">AI-First Intelligence</h3>
-              <p className="text-muted text-sm leading-relaxed">Powered by Gemini AI, our platform understands your goals and adapts in real-time.</p>
-            </div>
-          </motion.div>
-
-          {/* Large Card - Velocity */}
-          <motion.div 
-            whileInView={{ opacity: 1, scale: 1 }}
-            initial={{ opacity: 0, scale: 0.95 }}
-            viewport={{ once: false }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="md:col-span-2 p-10 rounded-3xl bg-gradient-to-br from-surface to-surface/50 border border-border flex flex-col justify-between relative overflow-hidden group min-h-[400px]"
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl group-hover:bg-orange-500/10 transition-colors" />
-             <div>
-              <Activity className="w-10 h-10 text-orange-500 mb-6" />
-              <h3 className="text-3xl font-display font-black mb-3">Instant Synergy</h3>
-              <p className="text-muted max-w-md leading-relaxed">Seamlessly transition between learning, coding, and applying without ever leaving the ecosystem.</p>
-            </div>
-            <div className="flex items-center gap-4 mt-8 text-orange-500 text-sm font-medium group-hover:gap-6 transition-all">
-              View Performance Metrics <ArrowRight className="w-4 h-4" />
-            </div>
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* --- SECTION 5: PROCESS --- */}
-      <section className="relative z-10 py-24 snap-section bg-surface/10 border-t border-border">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-6xl font-display font-black mb-4 tracking-tighter">The Penta Journey</h2>
-            <p className="text-muted max-w-md mx-auto">A streamlined path from curiosity to career mastery.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {/* Connecting Line */}
-            <div className="hidden md:block absolute top-14 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent z-0" />
+            <h1 className="text-6xl md:text-9xl lg:text-[14rem] font-display font-black tracking-tighter leading-none text-white drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+              HEXACORE
+            </h1>
+            <p className="text-white/40 text-lg lg:text-3xl tracking-[0.6em] uppercase font-bold mt-8">6 Dimensions. 1 Vision.</p>
             
-            {steps.map((step, i) => (
+            <motion.div 
+              animate={{ y: [0, 15, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="pt-20 flex flex-col items-center gap-4"
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/60 to-transparent" />
+              <p className="text-white/30 text-xs uppercase tracking-[0.4em] font-bold">Scroll to Explore</p>
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Dimension Overview */}
+        <section className="min-h-screen flex flex-col items-center justify-center px-6 py-32 relative">
+          <motion.h2 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="text-5xl lg:text-9xl font-display font-black tracking-tighter text-white mb-24 text-center"
+          >
+            THE ECOSYSTEM
+          </motion.h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 max-w-6xl w-full">
+            {dimensions.map((dim, i) => (
               <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false }}
-                transition={{ delay: i * 0.15, duration: 0.6 }}
-                className="relative z-10 text-center group"
+                key={dim.id} 
+                initial={{ opacity: 0, z: -200, rotateX: 20 }}
+                whileInView={{ opacity: 1, z: 0, rotateX: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: i * 0.1 }}
+                className="p-10 rounded-[32px] border border-white/10 bg-white/5 backdrop-blur-xl flex flex-col items-center text-center space-y-6 hover:bg-white/10 transition-colors group"
               >
-                <div className="relative w-28 h-28 rounded-2xl bg-surface border border-border flex items-center justify-center mx-auto mb-6 group-hover:border-blue-500/50 group-hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] transition-all duration-500">
-                  <step.icon className="w-10 h-10 text-muted group-hover:text-blue-400 transition-colors" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-blue-600 text-[10px] font-bold flex items-center justify-center border-4 border-bg">0{i+1}</div>
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${dim.color} flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform`}>
+                  <dim.icon className="w-8 h-8 text-white" />
                 </div>
-                <h4 className="text-xl font-display font-bold mb-2">{step.title}</h4>
-                <p className="text-muted text-sm leading-relaxed px-2">{step.desc}</p>
+                <h3 className="text-xl lg:text-2xl font-bold text-white tracking-tight">{dim.title}</h3>
+                <p className="text-xs lg:text-sm text-white/40 leading-relaxed">{dim.description}</p>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* --- SECTION 6: TESTIMONIALS --- */}
-      <section className="relative z-10 py-24 px-6 max-w-7xl mx-auto snap-section">
-        <div className="mb-20 text-center">
-          <h2 className="text-4xl md:text-6xl font-display font-black mb-4 tracking-tighter">Voices of the Ecosystem</h2>
-        </div>
+        {/* Dimensions Showcase (Vertical Stack) */}
+        {dimensions.map((dim, idx) => (
+          <DimensionScene 
+            key={dim.id} 
+            dimension={dim} 
+            index={idx} 
+          />
+        ))}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -5 }}
-              className="p-8 rounded-3xl bg-surface/50 border border-border hover:border-text/20 transition-all"
+        {/* Final Scene */}
+        <section className="min-h-screen flex items-center justify-center px-6 py-32">
+          <div className="max-w-5xl w-full text-center space-y-16">
+            <motion.h2 
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="text-6xl md:text-9xl lg:text-[12rem] font-display font-black tracking-tighter leading-none text-white"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full object-cover border border-border" referrerPolicy="no-referrer" />
-                <div>
-                  <h5 className="font-bold">{t.name}</h5>
-                  <p className="text-muted text-xs">{t.role}</p>
-                </div>
-              </div>
-              <p className="text-muted text-sm leading-relaxed italic">"{t.text}"</p>
-              <div className="mt-6 flex gap-1">
-                {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 text-yellow-500 fill-yellow-500" />)}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              ASCEND<br />BEYOND
+            </motion.h2>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 py-12">
+              {stats.map((s, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-center space-y-2"
+                >
+                  <div className="text-4xl lg:text-7xl font-display font-black text-white">{s.value}</div>
+                  <div className="text-xs uppercase tracking-[0.4em] text-white/40 font-bold">{s.label}</div>
+                </motion.div>
+              ))}
+            </div>
 
-      {/* --- SECTION 7: CTA --- */}
-      <section className="relative z-10 py-24 px-6 snap-section">
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
-          className="max-w-5xl mx-auto p-12 md:p-20 rounded-[3rem] bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-center relative overflow-hidden shadow-2xl"
-        >
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-7xl font-display font-black text-white mb-6 tracking-tighter leading-[0.9]">Ready to <br /> Evolve?</h2>
-            <p className="text-white/80 text-lg max-w-xl mx-auto mb-10">
-              Join thousands of professionals and students who are already shaping their future.
-            </p>
-            <Link to="/login" state={{ isSignup: true }}>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-10 py-4 bg-white text-blue-600 rounded-full text-sm font-bold shadow-lg hover:shadow-xl transition-shadow"
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
+              <Link to="/login" state={{ isSignup: true }}>
+                <motion.button 
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(255,255,255,0.3)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-16 py-6 bg-white text-black rounded-full text-sm font-black uppercase tracking-[0.3em]"
+                >
+                  Initialize Account
+                </motion.button>
+              </Link>
+              <button 
+                onClick={() => setIsDocOpen(true)}
+                className="px-16 py-6 border-2 border-white/10 hover:bg-white/5 rounded-full text-sm font-bold uppercase tracking-[0.3em] transition-all"
               >
-                Create Account
-              </motion.button>
-            </Link>
+                System Docs
+              </button>
+            </div>
           </div>
-        </motion.div>
-      </section>
+        </section>
+      </div>
 
-      {/* Footer */}
-      <footer className="relative z-10 py-12 border-t border-border px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-text text-bg rounded-lg flex items-center justify-center font-bold">P</div>
-            <span className="font-display font-bold text-lg">PENTA</span>
-          </div>
-          <div className="flex gap-8 text-xs text-muted">
-            <a href="#" className="hover:text-text transition-colors">Privacy</a>
-            <a href="#" className="hover:text-text transition-colors">Terms</a>
-            <a href="#" className="hover:text-text transition-colors">Security</a>
-          </div>
-          <div className="text-xs text-muted">© 2025 PENTA</div>
-        </div>
-      </footer>
+      {/* --- GLOBAL 3D DEBRIS --- */}
+      <div className="fixed inset-0 pointer-events-none z-0 perspective-[1000px] transform-style-3d">
+        {[...Array(60)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ 
+              x: (Math.random() - 0.5) * 2000, 
+              y: (Math.random() - 0.5) * 2000,
+              z: Math.random() * -5000,
+              rotate: Math.random() * 360
+            }}
+            style={{
+              z: useTransform(smoothProgress, [0, 1], [Math.random() * -5000, 2000]),
+              opacity: Math.random() * 0.5,
+              scale: Math.random() * 2
+            }}
+            className="absolute"
+          >
+            {i % 3 === 0 ? (
+              <div className="text-[8px] font-mono text-white/20 whitespace-nowrap">
+                {`0x${Math.random().toString(16).slice(2, 10)} >> HEXA_CORE`}
+              </div>
+            ) : (
+              <div className="w-1 h-1 bg-white rounded-full shadow-[0_0_10px_white]" />
+            )}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Video Controls */}
+      <div className="fixed bottom-10 left-10 z-[110] flex items-center gap-4">
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsVideoPaused(!isVideoPaused)}
+          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all"
+        >
+          {isVideoPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsVideoMuted(!isVideoMuted)}
+          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all"
+        >
+          {isVideoMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </motion.button>
+      </div>
+
+      {/* Video Controls */}
+      <div className="fixed bottom-10 left-10 z-[110] flex items-center gap-4">
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsVideoPaused(!isVideoPaused)}
+          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all"
+        >
+          {isVideoPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsVideoMuted(!isVideoMuted)}
+          className="w-12 h-12 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 flex items-center justify-center text-white/60 hover:text-white transition-all"
+        >
+          {isVideoMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </motion.button>
+      </div>
       {/* Documentation Modal */}
       <AnimatePresence>
         {isDocOpen && (
@@ -634,8 +751,8 @@ export default function LandingPage() {
             >
               <div className="flex items-center justify-between p-6 border-b border-border bg-surface/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-text text-bg rounded-lg flex items-center justify-center font-bold text-sm">P</div>
-                  <h3 className="text-xl font-display font-bold text-text">Penta Documentation</h3>
+                  <div className="w-8 h-8 bg-text text-bg rounded-lg flex items-center justify-center font-bold text-sm">H</div>
+                  <h3 className="text-xl font-display font-bold text-text">HexaCore Documentation</h3>
                 </div>
                 <button 
                   onClick={() => setIsDocOpen(false)}
@@ -647,172 +764,44 @@ export default function LandingPage() {
               
               <div className="p-6 md:p-10 overflow-y-auto custom-scrollbar">
                 <div className="prose prose-invert max-w-none">
-                  <h2 className="text-3xl font-display font-bold mb-6 text-text">Welcome to the 5th Dimension</h2>
+                  <h2 className="text-3xl font-display font-bold mb-6 text-text">Welcome to the 6th Dimension</h2>
                   <p className="text-muted leading-relaxed mb-8">
-                    Penta is a unified ecosystem where global learning, competitive coding, and professional growth converge into a single, AI-driven experience. This documentation outlines the core architecture and how to integrate with our modules.
+                    HexaCore is a unified ecosystem where global learning, competitive coding, professional networking, career acceleration, digital knowledge mastery, and AI innovation converge into a single, immersive experience.
                   </p>
 
                   <div className="space-y-12 mb-12">
-                    {/* Dimension 1 */}
-                    <div className="bg-surface/30 p-8 rounded-3xl border border-border">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center border border-blue-500/20">
-                          <Globe className="w-6 h-6 text-blue-500" />
+                    {dimensions.map((dim) => (
+                      <div key={dim.id} className="bg-surface/30 p-8 rounded-3xl border border-border">
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border border-white/10 bg-white/5`}>
+                            <dim.icon className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="text-2xl font-display font-bold text-text m-0">Dimension {dim.id}: {dim.title}</h4>
+                            <p className="text-white/40 text-sm font-mono mt-1">@hexa/{dim.title.toLowerCase().replace(/\s+/g, '-')}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="text-2xl font-display font-bold text-text m-0">Dimension 1: Global Study Platform</h4>
-                          <p className="text-blue-400 text-sm font-mono mt-1">@penta/study-core</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4 text-muted text-sm leading-relaxed">
-                        <p>
-                          The Global Study Platform is the foundation of the Penta ecosystem. It utilizes a proprietary Neural-link peer matching algorithm to connect learners across the globe based on skill level, learning pace, and timezone compatibility.
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2 text-muted">
-                          <li><strong className="text-text">WebRTC Integration:</strong> Sub-50ms latency for real-time audio/video collaboration and shared whiteboarding.</li>
-                          <li><strong className="text-text">Dynamic Curriculum API:</strong> AI-generated learning paths that adapt in real-time based on assessment scores and peer feedback.</li>
-                          <li><strong className="text-text">Translation Layer:</strong> Real-time NLP translation supporting 40+ languages to eliminate geographical learning barriers.</li>
-                        </ul>
-                        <div className="bg-bg/50 rounded-xl p-4 border border-border font-mono text-xs text-muted mt-4">
-                          <span className="text-purple-400">await</span> client.study.matchPeer({`{`} <br/>
-                          &nbsp;&nbsp;topic: <span className="text-green-400">'System Design'</span>,<br/>
-                          &nbsp;&nbsp;level: <span className="text-green-400">'Advanced'</span>,<br/>
-                          &nbsp;&nbsp;latencyPreference: <span className="text-orange-400">50</span><br/>
-                          {`}`});
+                        <div className="space-y-4 text-muted text-sm leading-relaxed">
+                          <p>{dim.fullDescription}</p>
+                          <ul className="list-disc pl-5 space-y-2 text-muted">
+                            {dim.features.map((f, i) => (
+                              <li key={i}><strong className="text-text">{f.title}:</strong> {f.desc}</li>
+                            ))}
+                          </ul>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Dimension 2 */}
-                    <div className="bg-surface/30 p-8 rounded-3xl border border-border">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center border border-purple-500/20">
-                          <Code className="w-6 h-6 text-purple-500" />
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display font-bold text-text m-0">Dimension 2: Elite Coding Arena</h4>
-                          <p className="text-purple-400 text-sm font-mono mt-1">@penta/arena-engine</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4 text-muted text-sm leading-relaxed">
-                        <p>
-                          A high-performance, sandboxed execution environment designed for competitive programming, technical interviews, and algorithmic battles.
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2 text-muted">
-                          <li><strong className="text-text">Isolated Runtimes:</strong> Secure Docker-based execution supporting 24+ languages with strict memory and CPU constraints.</li>
-                          <li><strong className="text-text">WebSocket Sync:</strong> Operational Transformation (OT) based real-time code synchronization for pair programming.</li>
-                          <li><strong className="text-text">Elo Rating System:</strong> Advanced matchmaking and global leaderboards updated in real-time using a modified Glicko-2 rating system.</li>
-                        </ul>
-                        <div className="bg-bg/50 rounded-xl p-4 border border-border font-mono text-xs text-muted mt-4">
-                          <span className="text-purple-400">const</span> session = <span className="text-purple-400">await</span> client.arena.createBattle({`{`} <br/>
-                          &nbsp;&nbsp;mode: <span className="text-green-400">'1v1'</span>,<br/>
-                          &nbsp;&nbsp;difficulty: <span className="text-green-400">'Hard'</span>,<br/>
-                          &nbsp;&nbsp;languageRestrictions: [<span className="text-green-400">'Rust'</span>, <span className="text-green-400">'Go'</span>, <span className="text-green-400">'C++'</span>]<br/>
-                          {`}`});
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dimension 3 */}
-                    <div className="bg-surface/30 p-8 rounded-3xl border border-border">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center border border-orange-500/20">
-                          <FileText className="w-6 h-6 text-orange-500" />
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display font-bold text-text m-0">Dimension 3: Resume Architect</h4>
-                          <p className="text-orange-400 text-sm font-mono mt-1">@penta/resume-ai</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4 text-muted text-sm leading-relaxed">
-                        <p>
-                          An intelligent profile builder that translates your activity across the Penta ecosystem into a verifiable, ATS-optimized professional portfolio.
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2 text-muted">
-                          <li><strong className="text-text">Semantic Extraction:</strong> NLP engine that parses GitHub repositories, LinkedIn profiles, and Penta Arena statistics to auto-generate bullet points.</li>
-                          <li><strong className="text-text">ATS Optimization:</strong> Real-time scoring against 5,000+ global job descriptions to ensure maximum keyword match rates.</li>
-                          <li><strong className="text-text">Dynamic Templates:</strong> Export to PDF, JSON Resume, or host as a dynamic web portfolio with verified skill badges.</li>
-                        </ul>
-                        <div className="bg-bg/50 rounded-xl p-4 border border-border font-mono text-xs text-muted mt-4">
-                          <span className="text-purple-400">const</span> resume = <span className="text-purple-400">await</span> client.resume.generate({`{`} <br/>
-                          &nbsp;&nbsp;targetRole: <span className="text-green-400">'Senior Frontend Engineer'</span>,<br/>
-                          &nbsp;&nbsp;includePentaStats: <span className="text-orange-400">true</span>,<br/>
-                          &nbsp;&nbsp;format: <span className="text-green-400">'ATS_STRICT'</span><br/>
-                          {`}`});
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dimension 4 */}
-                    <div className="bg-surface/30 p-8 rounded-3xl border border-border">
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center border border-emerald-500/20">
-                          <Briefcase className="w-6 h-6 text-emerald-500" />
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display font-bold text-text m-0">Dimension 4: Verified Job Network</h4>
-                          <p className="text-emerald-400 text-sm font-mono mt-1">@penta/talent-graph</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4 text-muted text-sm leading-relaxed">
-                        <p>
-                          A decentralized, trustless hiring network connecting verified talent directly with vetted companies, eliminating traditional recruitment friction.
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2 text-muted">
-                          <li><strong className="text-text">KYC Verification:</strong> All participating companies undergo strict verification to prevent ghost jobs and scams.</li>
-                          <li><strong className="text-text">Smart Contracts:</strong> Escrow-backed technical bounties and interview compensation mechanisms.</li>
-                          <li><strong className="text-text">Zero-Knowledge Proofs:</strong> Verify salary benchmarks and candidate expectations without revealing exact current compensation.</li>
-                        </ul>
-                        <div className="bg-bg/50 rounded-xl p-4 border border-border font-mono text-xs text-muted mt-4">
-                          <span className="text-purple-400">const</span> matches = <span className="text-purple-400">await</span> client.jobs.findMatches({`{`} <br/>
-                          &nbsp;&nbsp;minMatchScore: <span className="text-orange-400">0.85</span>,<br/>
-                          &nbsp;&nbsp;requireVerifiedSalary: <span className="text-orange-400">true</span><br/>
-                          {`}`});
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dimension 5 */}
-                    <div className="bg-surface/30 p-8 rounded-3xl border border-border relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                      <div className="flex items-center gap-4 mb-6 relative z-10">
-                        <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center border border-indigo-500/20">
-                          <Library className="w-6 h-6 text-indigo-500" />
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display font-bold text-text m-0">Dimension 5: Digital Knowledge Library</h4>
-                          <p className="text-indigo-400 text-sm font-mono mt-1">@penta/knowledge-graph</p>
-                        </div>
-                      </div>
-                      <div className="space-y-4 text-muted text-sm leading-relaxed relative z-10">
-                        <p>
-                          The Digital Knowledge Library indexes the world's research, tutorials, and documentation using advanced vector embeddings, allowing for semantic search that understands intent rather than just keywords.
-                        </p>
-                        <ul className="list-disc pl-5 space-y-2 text-muted">
-                          <li><strong className="text-text">Semantic Search Engine:</strong> Query millions of documents using natural language with sub-second retrieval times backed by Pinecone/Milvus.</li>
-                          <li><strong className="text-text">Interactive 3D Modules:</strong> WebGL-powered visualizations for complex scientific and engineering concepts.</li>
-                          <li><strong className="text-text">LLM Synthesis:</strong> Automatically synthesize answers from multiple verified sources with inline citations.</li>
-                        </ul>
-                        <div className="bg-bg/50 rounded-xl p-4 border border-border font-mono text-xs text-muted mt-4">
-                          <span className="text-purple-400">const</span> results = <span className="text-purple-400">await</span> client.library.semanticSearch({`{`} <br/>
-                          &nbsp;&nbsp;query: <span className="text-green-400">'How does Raft consensus work?'</span>,<br/>
-                          &nbsp;&nbsp;synthesizeAnswer: <span className="text-orange-400">true</span>,<br/>
-                          &nbsp;&nbsp;includeVisualizations: <span className="text-orange-400">true</span><br/>
-                          {`}`});
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
                   <h3 className="text-2xl font-display font-bold mb-4 text-text">Quick Start Guide</h3>
                   <div className="bg-surface/50 rounded-xl p-4 border border-border mb-8 font-mono text-sm text-text">
-                    <div className="text-muted mb-2"># Initialize the Penta SDK</div>
-                    <div className="text-blue-400">npm install</div> <div className="inline">@penta/sdk</div>
+                    <div className="text-muted mb-2"># Initialize the Hexa SDK</div>
+                    <div className="text-blue-400">npm install</div> <div className="inline">@hexa/sdk</div>
                     <br/><br/>
                     <div className="text-muted mb-2"># Authenticate your client</div>
-                    <div className="text-purple-400">import</div> <div className="inline">{`{ PentaClient }`}</div> <div className="text-purple-400">from</div> <div className="text-green-400">'@penta/sdk'</div>;
+                    <div className="text-purple-400">import</div> <div className="inline">{`{ HexaClient }`}</div> <div className="text-purple-400">from</div> <div className="text-green-400">'@hexa/sdk'</div>;
                     <br/>
-                    <div className="text-purple-400">const</div> <div className="inline">client = </div><div className="text-purple-400">new</div> <div className="inline">PentaClient(</div><div className="text-green-400">'YOUR_API_KEY'</div><div className="inline">);</div>
+                    <div className="text-purple-400">const</div> <div className="inline">client = </div><div className="text-purple-400">new</div> <div className="inline">HexaClient(</div><div className="text-green-400">'YOUR_API_KEY'</div><div className="inline">);</div>
                   </div>
 
                   <p className="text-muted text-sm italic">

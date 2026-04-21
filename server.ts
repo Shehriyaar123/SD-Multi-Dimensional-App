@@ -79,7 +79,6 @@ async function startServer() {
   // --- API ROUTES ---
   
   // File Upload Endpoint
-  // File Upload
   app.post("/api/upload", upload.single("file"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
@@ -111,6 +110,19 @@ async function startServer() {
       size: req.file.size,
       type: req.file.mimetype
     });
+  });
+
+  // Codeforces Proxy (CORS Bypass)
+  app.get("/api/proxy/codeforces", async (req, res) => {
+    try {
+      const response = await fetch('https://codeforces.com/api/problemset.problems');
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const data = await response.json();
+      res.json(data);
+    } catch (error) {
+      console.error("[Proxy Error] Codeforces:", error);
+      res.status(500).json({ status: "FAILED", message: "Failed to fetch from Codeforces" });
+    }
   });
 
   // Python NLP Health Check

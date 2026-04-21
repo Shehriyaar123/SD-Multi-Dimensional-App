@@ -17,6 +17,7 @@ interface PrivateMessagesViewProps {
   onSendMessage: (text: string, file?: { url: string, name: string, type: string, size: number }, replyTo?: { id: string, text: string, senderName: string, senderId: string }, extraFields?: Partial<Message>) => void;
   onSendAIMessage?: (text: string) => void;
   onCreateChat?: (name: string, type: 'dm' | 'group', participants: string[], participantDetails: Record<string, { name: string, avatar: string }>) => void;
+  onLoadMoreMessages?: (chatId: string) => void;
 }
 
 export default function PrivateMessagesView({
@@ -28,7 +29,8 @@ export default function PrivateMessagesView({
   onSendMessage,
   onSendAIMessage,
   onCreateChat,
-  onOpenSidebar
+  onOpenSidebar,
+  onLoadMoreMessages
 }: PrivateMessagesViewProps & { onOpenSidebar?: () => void }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -255,6 +257,7 @@ export default function PrivateMessagesView({
               onSendMessage={onSendMessage}
               onSendAIMessage={onSendAIMessage}
               onBack={() => setActiveChatId(null)}
+              onLoadMore={() => onLoadMoreMessages?.(activeChat.id)}
             />
           </div>
         ) : (

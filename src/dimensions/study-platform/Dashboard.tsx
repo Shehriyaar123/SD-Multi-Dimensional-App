@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, Hash, Star, Clock, ShieldCheck, Scale, Compass
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, onSnapshot, query, where, addDoc, serverTimestamp, doc, updateDoc, arrayUnion, orderBy } from "firebase/firestore";
+import { collection, onSnapshot, query, where, addDoc, serverTimestamp, doc, updateDoc, arrayUnion, orderBy, limit } from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { User, Group, PrivateChat, Message, UserStats } from "./types";
 import { ErrorBoundary } from "../../components/ErrorBoundary";
@@ -32,6 +32,7 @@ export default function StudyDashboard() {
   const [publicGroups, setPublicGroups] = useState<Group[]>([]);
   const [privateChats, setPrivateChats] = useState<PrivateChat[]>([]);
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
+  const [messageLimits, setMessageLimits] = useState<Record<string, number>>({});
   const [userStats, setUserStats] = useState<UserStats | null>(null);
 
   // Real-time User Stats
@@ -90,7 +91,13 @@ export default function StudyDashboard() {
   useEffect(() => {
     if (!activeChatId) return;
     const collectionName = activeView === 'public' ? "groups" : "chats";
-    const q = query(collection(db, collectionName, activeChatId, "messages"), orderBy("createdAt", "asc"));
+    const limitCount = messageLimits[activeChatId] || 30;
+    const q = query(
+      collection(db, collectionName, activeChatId, "messages"), 
+      orderBy("createdAt", "desc"),
+      limit(limitCount)
+    );
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data({ serverTimestamps: 'estimate' }) } as Message))
         .filter(msg => {
@@ -99,11 +106,20 @@ export default function StudyDashboard() {
             return msg.senderId === userProfile.id || role === 'admin' || role === 'teacher';
           }
           return true;
-        });
+        })
+        .reverse(); // Reverse because we ordered by desc for limitToLast effect but want to display in asc order
+      
       setMessages(prev => ({ ...prev, [activeChatId]: msgs }));
     });
     return () => unsubscribe();
-  }, [activeChatId, activeView, userProfile.id, role]);
+  }, [activeChatId, activeView, userProfile.id, role, messageLimits]);
+
+  const handleLoadMoreMessages = (chatId: string) => {
+    setMessageLimits(prev => ({
+      ...prev,
+      [chatId]: (prev[chatId] || 30) + 30
+    }));
+  };
 
   // Update current activity based on active view
   useEffect(() => {
@@ -540,6 +556,7 @@ export default function StudyDashboard() {
             onSendAIMessage={(text) => activeChatId && handleSendMessage(text)} // Simplified for now
             onCreateGroup={handleCreatePublicGroup}
             onOpenSidebar={() => setIsSidebarOpen(true)}
+            onLoadMoreMessages={handleLoadMoreMessages}
           />
         )}
         {activeView === 'private' && (
@@ -553,6 +570,7 @@ export default function StudyDashboard() {
             onSendAIMessage={(text) => activeChatId && handleSendMessage(text)} // Simplified for now
             onCreateChat={handleCreatePrivateChat}
             onOpenSidebar={() => setIsSidebarOpen(true)}
+            onLoadMoreMessages={handleLoadMoreMessages}
           />
         )}
       </main>
