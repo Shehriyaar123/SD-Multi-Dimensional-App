@@ -21,13 +21,13 @@ const RichTextEditor = ({ content, onChange }: { content: string, onChange: (htm
   if (!editor) return null;
 
   return (
-    <div className="relative bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
-      <div className="flex gap-2 p-2 border-b border-zinc-800 bg-zinc-800/50">
+    <div className="relative bg-[#18181b] border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="flex gap-2 p-2 border-b border-zinc-800 bg-[#27272a]">
         <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-1 rounded ${editor.isActive('bold') ? 'bg-zinc-700' : ''}`}><b>B</b></button>
         <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-1 rounded ${editor.isActive('italic') ? 'bg-zinc-700' : ''}`}><i>I</i></button>
         <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={`p-1 rounded ${editor.isActive('bulletList') ? 'bg-zinc-700' : ''}`}>• List</button>
       </div>
-      <EditorContent editor={editor} className="p-4 min-h-[100px] prose prose-invert prose-sm max-w-none" />
+      <EditorContent editor={editor} className="p-4 min-h-[100px] legacy-prose max-w-none text-zinc-300" />
     </div>
   );
 };
@@ -252,7 +252,7 @@ export default function ResumeArchitect() {
               onClick={() => setActiveSubTab(tab.id as SubTab)}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
                 activeSubTab === tab.id 
-                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' 
+                  ? 'bg-orange-500 text-white' 
                   : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
@@ -296,7 +296,7 @@ export default function ResumeArchitect() {
                 (window as any).downloadResume?.();
               }
             }}
-            className="flex items-center gap-2 px-6 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl text-sm font-bold transition-all shadow-xl"
+             className="flex items-center gap-2 px-6 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl text-sm font-bold transition-all"
           >
             <Download className="w-4 h-4" /> Export PDF
           </button>
@@ -586,7 +586,7 @@ export default function ResumeArchitect() {
                                 }))}
                                 className={`flex-1 py-1 text-[10px] font-bold uppercase rounded-lg transition-all ${
                                   (edu.gradeType || 'cgpa') === type 
-                                    ? 'bg-orange-500 text-white shadow-md' 
+                                    ? 'bg-orange-500 text-white' 
                                     : 'text-zinc-500 hover:text-zinc-300'
                                 }`}
                               >

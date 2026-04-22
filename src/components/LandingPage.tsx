@@ -37,6 +37,7 @@ import {
 import { useRef, useState, useEffect, ReactNode, MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { useSettings } from "../contexts/SettingsContext";
+import { auth } from "../firebase";
 
 // --- ENHANCED DATA WITH RICH PARAGRAPHS ---
 const dimensions = [
@@ -481,12 +482,21 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [isVideoPaused, setIsVideoPaused] = useState(false);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { theme, setTheme } = useSettings();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsLoggedIn(!!user);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -526,13 +536,13 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <Link to="/login">
+          <Link to={isLoggedIn ? "/select-dimension" : "/login"}>
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-5 lg:px-7 py-2 lg:py-2.5 bg-white text-black text-[9px] lg:text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg shadow-white/10"
             >
-              Access Portal
+              {isLoggedIn ? "Enter Hub" : "Access Portal"}
             </motion.button>
           </Link>
         </div>
@@ -644,13 +654,13 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8">
-              <Link to="/login" state={{ isSignup: true }}>
+              <Link to={isLoggedIn ? "/select-dimension" : "/login"} state={isLoggedIn ? {} : { isSignup: true }}>
                 <motion.button 
                   whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(255,255,255,0.3)" }}
                   whileTap={{ scale: 0.95 }}
                   className="px-16 py-6 bg-white text-black rounded-full text-sm font-black uppercase tracking-[0.3em]"
                 >
-                  Initialize Account
+                  {isLoggedIn ? "Enter Ecosystem" : "Initialize Account"}
                 </motion.button>
               </Link>
               <button 

@@ -1,9 +1,12 @@
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
 import { Globe, Code, Users, Briefcase, Library, ArrowRight, LogOut, Scale } from "lucide-react";
-import { useRole } from "../contexts/RoleContext";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { useRole, Role as UserRole } from "../contexts/RoleContext";
 import { useSettings } from "../contexts/SettingsContext";
 import FeedbackForm from "./FeedbackForm";
+import { useEffect, useState } from "react";
 
 const dimensions = [
   {
@@ -64,10 +67,38 @@ const dimensions = [
 ];
 
 export default function DimensionSelection() {
-  const { role } = useRole();
+  const { role, setRole } = useRole();
   const { theme } = useSettings();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        setIsLoading(true);
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setRole(userDoc.data().role as UserRole);
+          }
+        } catch (err) {
+          console.error("Error loading profile in hub:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, [setRole]);
 
   const filteredDimensions = dimensions.filter(dim => dim.allowedRoles.includes(role));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg text-text p-8 flex flex-col items-center justify-center relative overflow-hidden transition-colors duration-300">

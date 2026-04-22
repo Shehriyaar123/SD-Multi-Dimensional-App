@@ -23,6 +23,26 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user && !pendingOAuthUser) {
+        setIsLoading(true);
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setRole(userDoc.data().role as Role);
+            navigate('/select-dimension', { replace: true });
+          }
+        } catch (err) {
+          console.error("Error auto-redirecting:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate, setRole, pendingOAuthUser]);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
